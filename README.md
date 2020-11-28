@@ -29,50 +29,42 @@ r$run(port = 8000)
 ### Modelado e implemementación 
 
 - [x]  Modelado
-- [x]  Implementación
+- [x]  Implementación
 - [x]  Poblado
-- [x]  Serialización
+- [x]  Serialización
 
-### Transformación y consultas exploratorias (*3/3)
+### Transformación y consultas exploratorias (*3/3)
 
 - [x] 15 Consultas
 
-### Preparación de los dato
-
-- Muestreo 
-- Normalización 
-- Imputación 
-
-Según el profe pero tenemos imputación
-
-### Exploración Visual de datos
+### Exploración Visual de datos
 
 - [x]  Interpretación de los Graficos
 - [x]  Terminar los Gráficos que faltan
 
 ### Modelo 
 
-- [ x]   Interpretación
+- [x]   Interpretación
 
 ### Exportación y Comunicación 
 
 - [x]  CSV, TSV, EXCEL
 - [x]  JSON, XML
-- [x]  BD: Mysql, SQLite, etc
+- [x]  BD: Mysql, SQLite, etc [Link del Drive del Respaldo de la BD (500 mb)](https://drive.google.com/drive/folders/1JuOrKnyeDiOKUp4wlFTSaNzE2xTSrRKG?usp=sharing)
 
 ### Funcionalidad Adicional 
 
-- [x]  Envío de Correo
-- [ ]  Generación de Informe automático
-- [x]  Creación de un servicio API Rest - [https://www.rplumber.io](https://www.rplumber.io/)
-- [ ]  Creación de una Biblioteca Propia
+- [x]  Envío de Correo
+- [ ]  Generación de Informe automático
+- [x]  Creación de un servicio API Rest - [https://www.rplumber.io](https://www.rplumber.io/)
+- [ ]  Creación de una Biblioteca Propia
 
 ### Informe (1/1)
 
-- [x]  Descripción del caso de estudio
+- [x]  Descripción del caso de estudio
 - [x]  Procedimiento
 - [x]  Conclusiones
 
 ### Presentación (0/1)
 
-- [ ]  Presentación - Shiny
+- [ ]  Presentación - Shiny
