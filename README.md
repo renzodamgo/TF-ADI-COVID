@@ -5,7 +5,7 @@
 - Diego Johnson Ludeña
 
 ## Instalación
-Extraer fallecidos sinadef zip que se encuentra en la carpeta data
+Extraer fallecidos fallecidos_sinadef.zip que se encuentra en la carpeta data
 - Correr preprocesamiento y tablas para DB
 - En la carpeta exploración correr las consultas y gráficos
 - Correr modelos
@@ -13,7 +13,7 @@ Extraer fallecidos sinadef zip que se encuentra en la carpeta data
 
 ### Otros - Funcionalidades adicionales
 #### Enviar Mail:
-Otros/Funcinalidad Adicional.rmd
+Otros/Funcionalidad Adicional.rmd
 
 
 #### API:
@@ -59,7 +59,7 @@ r$run(port = 8000)
 
 ### Funcionalidad Adicional 
 
-- [x]  Envío de Correo
+- [x]  Envío de Correo - Fallo de uri por Api Key
 - [ ]  Generación de Informe automático
 - [x]  Creación de un servicio API Rest - [https://www.rplumber.io](https://www.rplumber.io/)
 - [ ]  Creación de una Biblioteca Propia
