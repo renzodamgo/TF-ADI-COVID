@@ -12,8 +12,8 @@ library(tableHTML)
 
 ## Envío por correo
 ```{r}
-msg = tableHTML(positivos2)
-html_bod <- paste0("<p> Te envío este dataframe que limpiamos </p>", msg)
+
+
 gm_auth_configure(key = "819376613095-rjqo1rglp9p8hdr7drmig6akvarskvj6.apps.googleusercontent.com",secret = "knSrQvbcW4Hiv_AEsh1cF6sI")
 
 gm_auth(email = TRUE,cache = "secret")
@@ -21,7 +21,7 @@ message <- mime() %>%
   to("diegojohnson46@gmail.com") %>%
   from("renzo.damian.go@gmail.com") %>%
   subject("Positivos Dataframe")%>%
-  html_body(html_bod)
+  body(positivos2)%>%
 gm_send_message(message)
 
 ```
