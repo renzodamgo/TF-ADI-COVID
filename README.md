@@ -1,4 +1,9 @@
 # Trabajo Final
+## Participantes
+- Renzo Damian Gomez
+- Joaquin Aguirre Peralta
+- Diego Johnson Ludeña
+
 ## Instalación
 Extraer fallecidos sinadef zip que se encuentra en la carpeta data
 - Correr preprocesamiento y tablas para DB
@@ -8,7 +13,7 @@ Extraer fallecidos sinadef zip que se encuentra en la carpeta data
 
 ### Otros - Funcionalidades adicionales
 #### Enviar Mail:
-Otros/Duncinalidad Adicional
+Otros/Funcinalidad Adicional.rmd
 
 
 #### API:
@@ -35,7 +40,7 @@ r$run(port = 8000)
 
 ### Transformación y consultas exploratorias (*3/3)
 
-- [x] 15 Consultas
+- [x] 30 Consultas
 
 ### Exploración Visual de datos
 
@@ -68,3 +73,6 @@ r$run(port = 8000)
 ### Presentación (0/1)
 
 - [ ]  Presentación - Shiny
+
+### Video
+- [x] Google Drive
