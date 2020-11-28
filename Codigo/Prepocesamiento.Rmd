@@ -56,7 +56,9 @@ fallecidos_sinadef$EDAD<-as.numeric(fallecidos_sinadef$EDAD)
 Eliminación de valores anómalos
 ```{r}
 fallecidos_covid <- fallecidos_covid %>% filter(SEXO == "MASCULINO" | SEXO == "FEMENINO")
-fallecidos_sinadef %>% filter(SEXO != "MASCULINO" | SEXO != "FEMENINO")
+fallecidos_sinadef<-fallecidos_sinadef %>% filter(SEXO != "MASCULINO" | SEXO != "FEMENINO")
+fallecidos_covid$FECHA_NAC = as.Date(fallecidos_covid$FECHA_FALLECIMIENTO) - lubridate::years(fallecidos_covid$EDAD)
+NROW(fallecidos_covid %>% filter(is.na(FECHA_NAC))) 
 fallecidos_sinadef_temp <- fallecidos_sinadef
 fallecidos_covid_temp   <-   fallecidos_covid
 positivos_temp          <-         positivos
@@ -66,6 +68,7 @@ Eliminación de Outliers
 ```{r}
 # eliminar a las personas de mas de 100 años
 fallecidos_sinadef %>% filter(EDAD <100 )
+
 ```
 
 Exportación de Archivos:
