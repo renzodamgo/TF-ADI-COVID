@@ -1,0 +1,66 @@
+---
+title: "Preprocesamiento y conexion al Servidor"
+output: html_notebook
+---
+
+```{r}
+source(file="./Configuracion.R")
+```
+
+Importación de datos
+```{r}
+positivos = read_xlsx("./Data/positivos_covid.xlsx")
+fallecidos_covid = read.csv2("./Data/fallecidos_covid.csv",fileEncoding = "LATIN1",header = TRUE, na.strings=c(""," ","NA"))
+fallecidos_sinadef = read.csv2("./Data/fallecidos_sinadef.csv",  fileEncoding = "LATIN1",sep = ";" ,header = TRUE, na.strings=c(""," ","NA"))
+covid_19 = read_xlsx('Data/Covid-19 Daily Financial Report.xlsx')
+fallecidos_sinadef
+```
+
+Imputación de Columnas con N.A o valores intrascendentes
+```{r}
+positivos$FECHA_CORTE<-NULL
+positivos$UUID<-NULL
+fallecidos_covid$FECHA_CORTE<-NULL
+fallecidos_covid$UUID<-NULL
+fallecidos_sinadef$X......<-NULL
+fallecidos_sinadef$X.2<-NULL
+fallecidos_sinadef$X.1<-NULL
+fallecidos_sinadef$X.3<-NULL
+fallecidos_sinadef$X<-NULL
+fallecidos_sinadef$COD..UBIGEO.DOMICILIO<-NULL
+fallecidos_sinadef$CAUSA.A..CIE.X.<-NULL
+fallecidos_sinadef$CAUSA.B..CIE.X.<-NULL
+fallecidos_sinadef$CAUSA.C..CIE.X.<-NULL
+fallecidos_sinadef$CAUSA.D..CIE.X.<-NULL
+fallecidos_sinadef$CAUSA.E..CIE.X.<-NULL
+fallecidos_sinadef$CAUSA.F..CIE.X.<-NULL
+fallecidos_sinadef$AÑO<-NULL
+fallecidos_sinadef$MES<-NULL
+fallecidos_sinadef$Nº<-NULL
+
+```
+Formateo de variables a Fecha o enteros
+```{r}
+fecha_temp<-strptime(positivos$FECHA_RESULTADO,"%Y%m%d")
+positivos$FECHA_RESULTADO<-fecha_temp
+fecha_temp<-strptime(fallecidos_covid$FECHA_FALLECIMIENTO,"%Y%m%d")
+fallecidos_covid$FECHA_FALLECIMIENTO <-fecha_temp
+fecha_temp<-strptime(fallecidos_covid$FECHA_NAC,"%Y%m%d")
+fallecidos_covid$FECHA_NAC <-fecha_temp
+fecha_temp<-strptime(fallecidos_sinadef$FECHA,"%Y-%m-%d")
+fallecidos_sinadef$FECHA <-fecha_temp
+positivos$EDAD <- as.numeric(positivos$EDAD)
+fallecidos_sinadef$EDAD<-as.numeric(fallecidos_sinadef$EDAD)
+```
+Eliminación de valores anómalos
+```{r}
+fallecidos_covid <- fallecidos_covid %>% filter(SEXO == "MASCULINO" | SEXO == "FEMENINO")
+fallecidos_sinadef %>% filter(SEXO != "MASCULINO" | SEXO != "FEMENINO")
+
+```
+
+Eliminación de Outliers
+```{r}
+# eliminar a las personas de mas de 100 años
+```
+
