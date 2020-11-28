@@ -65,6 +65,7 @@ positivos_temp          <-         positivos
 Eliminación de Outliers
 ```{r}
 # eliminar a las personas de mas de 100 años
+fallecidos_sinadef %>% filter(EDAD <100 )
 ```
 
 Exportación de Archivos:

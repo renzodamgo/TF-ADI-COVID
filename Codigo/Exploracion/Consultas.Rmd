@@ -111,17 +111,17 @@ q12 = dbGetQuery(conexion, "select DEPARTAMENTO.nombre, COUNT(FALLECIDO_SINADEF.
                 group by DEPARTAMENTO.nombre")
 q12
 ```
-Query 13 - FALLECIDOS POR COVID DEL  DEPARTAMENTO DE LIMA EN EL MEZ DE JULIO
+Query 13 - FALLECIDOS POR COVID DEL  DEPARTAMENTO DE LIMA EN EL MEZ DE JULIO en el 2019
 ```{r}
 q13 = dbGetQuery(conexion, "select DISTRITO.nombre, COUNT(FALLECIDO_COVID.id) from FALLECIDO_COVID
                 JOIN DEPARTAMENTO on FALLECIDO_COVID.DEPARTAMENTO_id = DEPARTAMENTO.id
                 JOIN DISTRITO ON FALLECIDO_COVID.DISTRITO_id = DISTRITO.id
-                where DEPARTAMENTO.nombre = 'LIMA' AND YEAR(FALLECIDO_COVID.fecha_fallecimiento) = '2020'
+                where DEPARTAMENTO.nombre = 'LIMA' AND YEAR(FALLECIDO_COVID.fecha_fallecimiento) = '2019'
                 AND MONTH(FALLECIDO_COVID.fecha_fallecimiento) = '8'
                 group by DISTRITO.nombre")
 q13
 ```
-Query 14 - POSITIVOS COVID DEL DEPARTAMENTO DE LIMA EN EL MEZ DE JULIO 
+Query 14 - POSITIVOS COVID DEL DEPARTAMENTO DE LIMA EN EL MEZ DE JULIO el 2020
 ```{r}
 q14 = dbGetQuery(conexion, "select DISTRITO.nombre, COUNT(POSITIVO_COVID.id) from POSITIVO_COVID
                 JOIN DEPARTAMENTO on POSITIVO_COVID.DEPARTAMENTO_id = DEPARTAMENTO.id
