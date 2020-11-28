@@ -14,7 +14,7 @@ positivos = read_xlsx("./Data/positivos_covid.xlsx")
 fallecidos_covid = read.csv2("./Data/fallecidos_covid.csv",fileEncoding = "LATIN1",header = TRUE, na.strings=c(""," ","NA"))
 fallecidos_sinadef = read.csv2("./Data/fallecidos_sinadef.csv",  fileEncoding = "LATIN1",sep = ";" ,header = TRUE, na.strings=c(""," ","NA"))
 covid_19 = read_xlsx('Data/Covid-19 Daily Financial Report.xlsx')
-fallecidos_sinadef
+
 ```
 
 Imputación de Columnas con N.A o valores intrascendentes
@@ -57,7 +57,9 @@ Eliminación de valores anómalos
 ```{r}
 fallecidos_covid <- fallecidos_covid %>% filter(SEXO == "MASCULINO" | SEXO == "FEMENINO")
 fallecidos_sinadef %>% filter(SEXO != "MASCULINO" | SEXO != "FEMENINO")
-
+fallecidos_sinadef_temp <- fallecidos_sinadef
+fallecidos_covid_temp   <-   fallecidos_covid
+positivos_temp          <-         positivos
 ```
 
 Eliminación de Outliers
@@ -70,9 +72,307 @@ Exportación de Archivos:
 ```{r}
 #Exportar archivos en csv
 write.csv(fallecidos_sinadef,"./Data/fallecidos_sinadef_clean.csv", row.names = FALSE)
+write.csv(fallecidos_covid,"./Data/fallecidos_covid_clean.csv", row.names = FALSE)
 #exportar en json
 x<- toJSON(positivos)
 write(x, "./Data/positivos.json")
-#Guardar database
+```
+---
+title: "Preprocesamiento y conexion al Servidor"
+---
+Creacion Tabla Departamento
+```{r}
+DEPARTAMENTO = c(fallecidos_covid$DEPARTAMENTO, positivos$DEPARTAMENTO, fallecidos_sinadef$DEPARTAMENTO.DOMICILIO)
+DEPARTAMENTO <- unique(DEPARTAMENTO)
+Id<-(1:(NROW(DEPARTAMENTO)))
+DEPARTAMENTO = data.frame(DEPARTAMENTO, Id)
+colnames(DEPARTAMENTO)[1]  <- "nombre"
+DEPARTAMENTO
 ```
 
+Creacion Tabla Provincia
+```{r}
+PROVINCIA = c(fallecidos_covid$PROVINCIA, positivos$PROVINCIA, fallecidos_sinadef$PROVINCIA.DOMICILIO)
+PROVINCIA <- unique(PROVINCIA)
+Id<-(1:(NROW(PROVINCIA)))
+PROVINCIA = data.frame(PROVINCIA, Id)
+colnames(PROVINCIA)[1]  <- "nombre"
+PROVINCIA
+```
+Creacion Tabla Distrito
+```{r}
+DISTRITO = c(fallecidos_covid$DISTRITO, positivos$DISTRITO, fallecidos_sinadef$DISTRITO.DOMICILIO)
+DISTRITO <- unique(DISTRITO)
+Id<-(1:(NROW(DISTRITO)))
+DISTRITO = data.frame(DISTRITO, Id)
+colnames(DISTRITO)[1]  <- "nombre"
+DISTRITO
+```
+Creacion Tabla Pais
+```{r}
+PAIS = c(fallecidos_sinadef$PAIS.DOMICILIO)
+PAIS <- unique(PAIS)
+Id<-(1:(NROW(PAIS)))
+PAIS = data.frame(PAIS, Id)
+colnames(PAIS)[1]  <- "nombre"
+PAIS
+```
+Creacion Tabla Sexo
+```{r}
+sexo <- fallecidos_sinadef %>% group_by(`SEXO`) %>%  summarise()
+sexo <- unique(sexos)
+id <- c(1:NROW(sexo))
+SEXO = data.frame(id, sexo)
+SEXO
+```
+Creacion Tabla Metodo
+```{r}
+metodos <- positivos %>% group_by(`METODODX`) %>%  summarise()
+metodos <- unique(metodos)
+colnames(metodos)[1]  <- "nombre"
+id<-c(1:NROW(metodos))
+METODO = data.frame(id, metodos)
+METODO
+```
+Creacion Tabla Institucion
+```{r}
+instituciones <- fallecidos_sinadef %>% group_by(`INSTITUCION`) %>% summarise()
+colnames(instituciones)[1]  <- "nombre"
+id<-c(1:NROW(instituciones))
+INSTITUCION = data.frame(id, nombre)
+INSTITUCION
+```
+Creacion Tabla Seguro
+```{r}
+seguros <- fallecidos_sinadef %>% group_by(`TIPO.SEGURO`) %>% summarise()
+id<-c(1:NROW(seguros))
+colnames(seguros)[1]  <- "tipo"
+SEGURO = data.frame(id, seguros)
+SEGURO
+```
+Tipo Lugar
+```{r}
+LUGAR <- fallecidos_sinadef %>% group_by(TIPO.LUGAR)  %>% summarise()
+id<-c(1:NROW(LUGAR))
+colnames(LUGAR)[1]  <- "nombre"
+LUGAR = data.frame(id, LUGAR)
+LUGAR
+```
+Nivel Instruccion
+```{r}
+instruccion <- fallecidos_sinadef %>% group_by(`NIVEL.DE.INSTRUCCIÓN`) %>%  summarise()
+id<-c(1:NROW(instruccion))
+colnames(instruccion)[1]  <- "nivel"
+NIVEL_INSTRUCCION = data.frame(id, instruccion)
+NIVEL_INSTRUCCION
+```
+Tabla Causa
+```{r}
+causas <- c(fallecidos_sinadef$DEBIDO.A..CAUSA.A., fallecidos_sinadef$DEBIDO.A..CAUSA.B., fallecidos_sinadef$DEBIDO.A..CAUSA.C.,
+            fallecidos_sinadef$DEBIDO.A..CAUSA.D., fallecidos_sinadef$DEBIDO.A..CAUSA.E., fallecidos_sinadef$DEBIDO.A..CAUSA.F.)
+causas <- unique(causas)
+causas <- gsub("Ó", "O", causas)
+causas <- gsub("Á", "A", causas)
+causas <- gsub("É", "E", causas)
+causas <- gsub("Í", "I", causas)
+causas <- gsub("Ú", "U", causas)
+causas <- unique(causas)
+id<-c(1:NROW(causas))
+CAUSAS = data.frame(causas, id)
+colnames(CAUSAS)[1]  <- "nombre"
+CAUSAS 
+```
+Tabla Fallecido causa
+```{r}
+fallecidos_sinadef[17:22] <- data.frame(lapply(fallecidos_sinadef[17:22], function(x) { gsub("Á", "A", x) }))
+fallecidos_sinadef[17:22] <- data.frame(lapply(fallecidos_sinadef[17:22], function(x) { gsub("É", "E", x) }))
+fallecidos_sinadef[17:22] <- data.frame(lapply(fallecidos_sinadef[17:22], function(x) { gsub("Í", "I", x) }))
+fallecidos_sinadef[17:22] <- data.frame(lapply(fallecidos_sinadef[17:22], function(x) { gsub("Ó", "O", x) }))
+fallecidos_sinadef[17:22] <- data.frame(lapply(fallecidos_sinadef[17:22], function(x) { gsub("Ú", "U", x) }))
+
+indicesA<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.A., CAUSAS$nombre)
+indicesB<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.B., CAUSAS$nombre)
+indicesC<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.C., CAUSAS$nombre)
+indicesD<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.D., CAUSAS$nombre)
+indicesE<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.E., CAUSAS$nombre)
+indicesF<-match(fallecidos_sinadef$DEBIDO.A..CAUSA.F., CAUSAS$nombre)
+indices_total = c(indicesA, indicesB, indicesC, indicesD, indicesE, indicesF)
+FALLECIDO_id = c(1:NROW(fallecidos_sinadef),1:NROW(fallecidos_sinadef),1:NROW(fallecidos_sinadef),1:NROW(fallecidos_sinadef),1:NROW(fallecidos_sinadef),1:NROW(fallecidos_sinadef))
+FALLECIDO_CAUSA = data.frame(FALLECIDO_id, CAUSA_id)
+FALLECIDO_CAUSA$FALLECIDO_id = FALLECIDO_id
+FALLECIDO_CAUSA$CAUSA_id = indices_total
+FALLECIDO_CAUSA
+```
+Tabla Fallecido Covid
+```{r}
+##agregando sexo forenkey
+indices<-match(fallecidos_covid$SEXO, SEXO$sexo)
+fallecidos_covid$SEXO_id = indices
+fallecidos_covid<-fallecidos_covid[-c(3)]
+
+##Agregando distrito forenkey
+indices<-match(fallecidos_covid$DISTRITO, DISTRITO$nombre)
+fallecidos_covid$DISTRITO_id = indices
+fallecidos_covid<-fallecidos_covid[-c(6)]
+
+##Agregando Provincia forenkey
+indices<-match(fallecidos_covid$PROVINCIA, PROVINCIA$nombre)
+fallecidos_covid$PROVINCIA_id = indices
+fallecidos_covid<-fallecidos_covid[-c(5)]
+
+
+##Agregando Departamento forenkey
+indices<-match(fallecidos_covid$DEPARTAMENTO, DEPARTAMENTO$nombre)
+fallecidos_covid$DEPARTAMENTO_id = indices
+fallecidos_covid<-fallecidos_covid[-c(4)]
+
+#AGREANDO PK
+fallecidos_covid$id = c(1:(NROW(fallecidos_covid)))
+colnames(fallecidos_covid)[3]  <- "fecha_nacimiento"
+colnames(fallecidos_covid)[2]  <- "edad_declarada"
+colnames(fallecidos_covid)[1]  <- "fecha_fallecimiento"
+
+fallecidos_covid
+```
+
+Tabla Positivo Covid
+```{r}
+#agregando sexo forenkey 
+indices<-match(positivos$SEXO, SEXO$sexo)
+positivos$SEXO_id = indices
+positivos<-positivos[-c(6)]
+
+#Agregando distrito forenkey
+indices<-match(positivos$DISTRITO, DISTRITO$nombre)
+positivos$DISTRITO_id = indices
+positivos<-positivos[-c(3)]
+
+#Agregando Provincia forenkey
+indices<-match(positivos$PROVINCIA, PROVINCIA$nombre)
+positivos$PROVINCIA_id = indices
+positivos<-positivos[-c(2)]
+
+#Agregando Departamento forenkey
+indices<-match(positivos$DEPARTAMENTO, DEPARTAMENTO$nombre)
+positivos$DEPARTAMENTO_id = indices
+positivos<-positivos[-c(1)]
+
+#Agregando Metodo forenkey
+indices<-match(positivos$METODODX, METODO$nombre)
+positivos$METODO_id = indices
+positivos<-positivos[-c(1)]
+
+positivos$id = c(1:(NROW(positivos)))
+colnames(positivos)[1]  <- "edad"
+colnames(positivos)[2]  <- "fecha_resultado"
+positivos
+```
+Tabla Fallecido Sinadef
+```{r}
+#agregando sexo forenkey 
+indices<-match(fallecidos_sinadef$SEXO, SEXO$sexo)
+fallecidos_sinadef$SEXO_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(3)]
+
+#Agregando distrito forenkey
+indices<-match(fallecidos_sinadef$`DISTRITO.DOMICILIO`, DISTRITO$nombre)
+fallecidos_sinadef$DISTRITO_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(10)]
+
+#Agregando Provincia forenkey
+indices<-match(fallecidos_sinadef$`PROVINCIA.DOMICILIO`, PROVINCIA$nombre)
+fallecidos_sinadef$PROVINCIA_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(9)]
+
+
+#Agregando Departamento forenkey
+indices<-match(fallecidos_sinadef$DEPARTAMENTO.DOMICILIO, DEPARTAMENTO$nombre)
+fallecidos_sinadef$DEPARTAMENTO_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(8)]
+
+#Agregando SEGURO forenkey
+indices<-match(fallecidos_sinadef$`TIPO.SEGURO`, SEGURO$tipo)
+fallecidos_sinadef$SEGURO_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(2)]
+
+#Agregando NIVEL INSTRUCCION forenkey
+indices<-match(fallecidos_sinadef$NIVEL.DE.INSTRUCCIÓN, NIVEL_INSTRUCCION$nivel)
+fallecidos_sinadef$NIVEL_INSTRUCCION_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(5)]
+
+#Agregando PAIS forenkey
+indices<-match(fallecidos_sinadef$`PAIS.DOMICILIO`, PAIS$nombre)
+fallecidos_sinadef$PAIS_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(5)]
+
+#Agregando LUGAR forenkey
+indices<-match(fallecidos_sinadef$`TIPO.LUGAR`, LUGAR$nombre)
+fallecidos_sinadef$LUGAR_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(6)]
+
+#Agregando NIVEL INSTITUCION forenkey
+indices<-match(fallecidos_sinadef$INSTITUCION, INSTITUCION$nombre)
+fallecidos_sinadef$INSTITUCION_id = indices
+fallecidos_sinadef<-fallecidos_sinadef[-c(6)]
+
+##Eliminando ultimas columnas en fallecidos
+fallecidos_sinadef <- fallecidos_sinadef[-c(8:13)]
+colnames(fallecidos_sinadef)[1]  <- "id"
+colnames(fallecidos_sinadef)[2]  <- "edad"
+colnames(fallecidos_sinadef)[3]  <- "tiempo_edad"
+colnames(fallecidos_sinadef)[4]  <- "estado_civil"
+colnames(fallecidos_sinadef)[5]  <- "fecha"
+colnames(fallecidos_sinadef)[6]  <- "muerte_violenta"
+colnames(fallecidos_sinadef)[7]  <- "necropsia"
+
+```
+Parametros de la conexion
+```{r}
+driver=MySQL()
+host = "35.174.139.24"
+port = 3306
+user="admin"
+password="admin2020"
+dbname="COVID_DB"
+```
+Crear conexion a la base de datos
+```{r}
+dbCanConnect(drv=driver,host=host,port=port,username=user,password=password,dbname=dbname)
+conexion<-dbConnect(drv=driver,host=host,port=port,username=user,password=password,dbname=dbname)
+dbIsValid(conexion)
+DBI::dbSendQuery(conexion, "SET SESSION WAIT_TIMEOUT=9999999")
+DBI::dbSendQuery(conexion, "SET SESSION MAX_EXECUTION_TIME=9999999")
+```
+Creando tablas en nuestro servidor
+```{r}
+#dbWriteTable(conexion,"PAIS", PAIS)
+#dbWriteTable(conexion,"DISTRITO",DISTRITO)
+#dbWriteTable(conexion,"PROVINCIA",PROVINCIA)
+#dbWriteTable(conexion,"DEPARTAMENTO",DEPARTAMENTO)
+#dbWriteTable(conexion,"FALLECIDO_COVID", fallecidos_covid)
+#dbWriteTable(conexion,"POSITIVO_COVID", positivos)
+#dbWriteTable(conexion,"METODO", METODO)
+#dbWriteTable(conexion,"SEXO", SEXO)
+#dbWriteTable(conexion,"INSTITUCION", INSTITUCION)
+#dbWriteTable(conexion,"FALLECIDO_SINADEF", fallecidos_sinadef)
+#dbWriteTable(conexion,"SEGURO", SEGURO)
+#dbWriteTable(conexion,"LUGAR", LUGAR)
+#dbWriteTable(conexion,"NIVEL_INSTRUCCION", NIVEL_INSTRUCCION)
+#dbWriteTable(conexion,"FALLECIDO_CAUSA", FALLECIDO_CAUSA)
+#dbWriteTable(conexion,"CAUSA", CAUSAS)
+dbListTables(conexion)
+```
+Serialización
+```{r}
+DB<-list()
+tablas<-dbListTables(conexion)
+for(i in tablas){
+  cat(i)
+  DB[[i]]<- dbReadTable(conexion, i)
+}
+names(DB)
+save(DB, file = "Data/Backup.RData")
+data = load(file = "Data/Backup.RData")
+dbDisconnect(conexion)
+
+```

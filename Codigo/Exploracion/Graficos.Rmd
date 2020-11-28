@@ -10,6 +10,10 @@ library(lubridate)
 library(ggforce)
 library(plotly)
 options(scipen=10000)
+
+fallecidos_sinadef<-fallecidos_sinadef_temp
+fallecidos_covid<-fallecidos_covid_temp  
+positivos<-positivos_temp         
 ```
 
 

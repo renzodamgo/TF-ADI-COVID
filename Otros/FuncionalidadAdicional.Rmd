@@ -3,15 +3,31 @@ title: "Funcionalidad Adicional"
 output: html_notebook
 ---
 
+```{r}
+
+install.packages("gmailr")
+library(gmailr)
+library(tableHTML)
+```
+
+## Envío por correo
+```{r}
+msg = tableHTML(positivos2)
+html_bod <- paste0("<p> Te envío este dataframe que limpiamos </p>", msg)
+gm_auth_configure(key = "819376613095-rjqo1rglp9p8hdr7drmig6akvarskvj6.apps.googleusercontent.com",secret = "knSrQvbcW4Hiv_AEsh1cF6sI")
+
+gm_auth(email = TRUE,cache = "secret")
+message <- mime() %>%
+  to("diegojohnson46@gmail.com") %>%
+  from("renzo.damian.go@gmail.com") %>%
+  subject("Positivos Dataframe")%>%
+  html_body(html_bod)
+gm_send_message(message)
+
+```
 
 
 ```{r}
-plot(cars)
+
 ```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
