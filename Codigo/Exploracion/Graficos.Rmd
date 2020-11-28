@@ -8,12 +8,13 @@ library(dplyr)
 library(ggplot2)
 library(lubridate)
 library(ggforce)
+library(plotly)
 options(scipen=10000)
 ```
 
 
-Estado Civil y Cantidad de Fallecidos SINADEF DATABASE
-Interpretación:
+1. Estado Civil y Cantidad de Fallecidos SINADEF DATABASE
+Interpretación: El porcentaje de personas que mueren solteras en Perú es muy alta incluso ganandole a casados, algo muy impactante ya que la sociedad peruana disimula que la mayoría de personas estan casadas por tabu
 ```{r}
 fallecidos_sinadef
 g1 <- fallecidos_sinadef %>%  group_by(ESTADO.CIVIL) %>% summarise( Cantidad = n())
@@ -21,8 +22,8 @@ g1 <- g1[order(-g1$Cantidad),]
 g1 %>%ggplot(aes(y = reorder(ESTADO.CIVIL,Cantidad), x =Cantidad, fill=ESTADO.CIVIL)) + geom_bar(stat="identity")+ theme(legend.position='none') +ggtitle("Estado Civil y Cantidad de Fallecidos SINADEF DATABASE") 
 ```
 
-Muertos por sexo
-Interpretación:
+2. Muertos por sexo
+Interpretación: han muerto más de 5 mil hombres que mujeres en los últimos años
 ```{r}
 g2 <- fallecidos_sinadef %>%  group_by(SEXO) %>% summarise( Cantidad = n())
 g2 <- g2[c(1,3),]
@@ -30,25 +31,24 @@ g2 %>%ggplot(aes(y =SEXO, x =Cantidad, fill=SEXO)) + geom_bar(stat="identity")+ 
 ```
 
 
-Cantidad de fallecidos del 2017 al 2020
-Interpretación:
+3. Cantidad de fallecidos del 2017 al 2020
+Interpretación: La cantidad de muertes es casi el doble en el último año debido al covid
 ```{r}
 g3<- fallecidos_sinadef %>%  group_by("YEAR" = year(FECHA)) %>% summarise( Cantidad = n())
 g3 %>%ggplot(aes(y =Cantidad, x =YEAR,fill=YEAR)) + geom_bar(stat="identity")+ theme(legend.position='none') +ggtitle("Cantidad de fallecidos del 2017 al 2020") 
 ```
 
 
-Cantidad de fallecidos por COVID en serie de tiempo
-Interpretación:
+4. Cantidad de fallecidos por COVID en serie de tiempo
+Interpretación: Se puede ver la primera ola a mediados de año y subsecuente bajada luego de alcanzar la inmunidad de rebaño
 ```{r}
 g4<- fallecidos_covid %>%  group_by("Mes" = month(as.Date(FECHA_FALLECIMIENTO))) %>% summarise( Cantidad = n())
-g4
 g4 %>%ggplot(aes(y =Cantidad, x = Mes )) + geom_bezier(stat="identity")+ theme(legend.position='none') +ggtitle("Cantidad de fallecidos por COVID en serie de tiempo") + scale_x_continuous(labels=as.character(month.abb[g4$Mes] ),breaks=g4$Mes)
 ```
 
 
-Diferencia de sexo en positivos de covid
-Interpretación:
+5. Diferencia de sexo en positivos de covid
+Interpretación: La cantidad de hombres infectados por covid duplica a la de los infectados en mujeres, esto puede ser a que los hombres no toman las precauciones necesarias
 ```{r}
 g5<- fallecidos_covid %>%  group_by("Sexo" = SEXO) %>% summarise( Cantidad = n())
 g5 %>%ggplot(aes(y =Cantidad, x = Sexo ,fill=Sexo)) + geom_bar(stat="identity")+ theme(legend.position='none') +ggtitle("Diferencia de sexo en positivos de covid")
@@ -56,8 +56,8 @@ g5 %>%ggplot(aes(y =Cantidad, x = Sexo ,fill=Sexo)) + geom_bar(stat="identity")+
 ```
 
 
-Diferencia de sexo entre fallecidos en junio
-Interpretación:
+6. Diferencia de sexo entre fallecidos en junio
+Interpretación: Según la edad se puede determinar que la edad en que hay más fallecidos de mujeres es entre los 57 a 77 años comparado con los hombres que es un poco mas bajo
 ```{r}
 g6<- fallecidos_covid %>% filter(PROVINCIA=="LIMA" & month(FECHA_FALLECIMIENTO)==6)
 g6 %>%ggplot(aes(y =EDAD_DECLARADA, x =SEXO ,fill=SEXO)) +  geom_boxplot() +ggtitle("Diferencia de sexo entre fallecidos en junio")
@@ -65,8 +65,8 @@ g6 %>%ggplot(aes(y =EDAD_DECLARADA, x =SEXO ,fill=SEXO)) +  geom_boxplot() +ggti
 ```
 
 
-Comparación de fallecidos en departamentos, mes de Octubre
-Interpretación:
+7. Comparación de fallecidos en departamentos, mes de Octubre
+Interpretación: Arequipa tiene el mayor número de infectados y fallecidos y departamentos como Ancash y San Martín tiene una cantidad parecida de fallecidos por covid pero discrepa mucho su cantidad de fallecidos por más de 5 mil.
 ```{r}
 g7_1<- fallecidos_covid %>% filter(DEPARTAMENTO!="LIMA" & month(FECHA_FALLECIMIENTO)==8 & year(FECHA_FALLECIMIENTO)== 2020)
 g7_2<- fallecidos_sinadef %>% filter(DEPARTAMENTO.DOMICILIO!="LIMA" & month(FECHA)==8 & year(FECHA)== 2020)
@@ -82,8 +82,8 @@ g7 %>%ggplot(aes(Fallecidos,FallecidosCovid ,color =DEPARTAMENTO)) +  geom_point
 
 
 
-positivos por covid vs fallecidos por covid en Lima en Julio
-Interpretación:
+8. positivos por covid vs fallecidos por covid en Lima en Julio
+Interpretación:San Juan de lurigancho es el peor distrito que ha manejado  el covid por un gran margen.
 ```{r}
 g8_1<- fallecidos_covid %>% filter(DEPARTAMENTO=="LIMA" & month(FECHA_FALLECIMIENTO)==7 & year(FECHA_FALLECIMIENTO)== 2020)
 g8_2<- positivos %>% filter(DEPARTAMENTO=="LIMA" & month(FECHA_RESULTADO)==7 & year(FECHA_RESULTADO)== 2020)
@@ -95,44 +95,41 @@ g8 %>%ggplot(aes(Positivos,FallecidosCovid ,color =DISTRITO)) +  geom_point()+gg
 ```
 
 
-
-
-Positivos de Covid en Cajamarca por día
-Interpretación:
+9. Positivos de Covid en Cajamarca por día
+Interpretación: En el mes de julio el rango de edad donde existe mayor cantidad de contagios en cajamarca se ha mantenido
 ```{r}
-g_9<- positivos_covid%>% filter(DEPARTAMENTO=="CAJAMARCA" & month(FECHA_RESULTADO)==7 & year(FECHA_RESULTADO)== 2020)
+g_9<- positivos%>% filter(DEPARTAMENTO=="CAJAMARCA" & month(FECHA_RESULTADO)==7 & year(FECHA_RESULTADO)== 2020)
 g_9 %>% ggplot(aes(as.factor( day(FECHA_RESULTADO)),EDAD )) +  geom_boxplot()+ggtitle("Positivos de Covid en Cajamarca") 
 ```
-
-Interpretación:
+10. Diagrama de cajas de Departamento y Edad
+Interpretación: El rango de contagios en los repartamentos han sido similares en varios departamentos confirmando que el virus afecta más a las personas que estan entre 60 y 80 años
 ```{r}
 g_10<- fallecidos_covid 
 g_10 %>% ggplot(aes(DEPARTAMENTO,EDAD_DECLARADA ,fill = DEPARTAMENTO)) +  geom_boxplot()+ggtitle("Diagrama de Cajas por Departamento") 
 ```
-
-Interpretación:
+11. Diferencia de muertos entre el año 2010-2020 vs muertos por coronavirus
+Interpretación:Se puede observar como aumentaron la cantidad de fallecidos en el 2020 y como se correlaciona a las muertes de covid
 ```{r}
-g11_2 <- fallecidos %>% filter(year(FECHA)==2020 & month(FECHA)>2)%>% group_by("Mes" = month(FECHA)) %>% summarise( Cantidad = n())
+g11_2 <- fallecidos_sinadef %>% filter(year(FECHA)==2020 & month(FECHA)>2)%>% group_by("Mes" = month(FECHA)) %>% summarise( Cantidad = n())
 g11<- fallecidos_covid%>% filter(month(FECHA_FALLECIMIENTO)<12) %>%  group_by("Mes" = month(as.Date(FECHA_FALLECIMIENTO))) %>% summarise( Cantidad = n())
 g11$Tipo = "Fallecidos Covid"
 g11_2$Tipo = "Fallecidos"
 g11 <- rbind(g11,g11_2)
-g11
 g11%>% ggplot(aes(y =Cantidad, x = Mes,fill=Tipo  )) + geom_bar(position="dodge",stat="identity")+ theme()+ scale_x_continuous(labels=as.character(month.abb[g11$Mes] ),breaks=g11$Mes)
 ```
-
-Interpretación:
+12. Promedio de muertos en Miraflores por Mes
+Interpretación: El promedio de edades en las cuales se a contagiado los miraflorinos se ha mantenido en 42
 ```{r}
-g12 <- positivos_covid %>% filter(DISTRITO=="MIRAFLORES")
+g12 <- positivos %>% filter(DISTRITO=="MIRAFLORES")
 g12<-g12 %>% group_by( "Mes"=month(FECHA_RESULTADO)) %>% summarise(Promedio = mean(EDAD)) 
 g12%>% ggplot(aes(y =Promedio, x = Mes  )) + geom_bar(stat="identity")+  scale_x_continuous(labels=as.character(month.abb[g12$Mes] ),breaks=g12$Mes)
 ```
 
-
-Interpretación:
+13. Diferencia de Fallecidos entre 2019-2020 vs Fallecidos por Covid
+Interpretación:Se puede ver la diferencia de muertos la cual debería ser similar a las muertes por coronavirus, sin embargo la primera trriplica la cantidad de fallecidos por covid dando a entender que no se estas reportando la cantidad de muertes reales por covid por falta de testeo 
 ```{r}
-g13<- fallecidos %>% filter(year(FECHA)==2019) %>% group_by(month(FECHA))%>% summarise(cantidad = n())
-g13_1<-fallecidos %>% filter(year(FECHA)==2020)%>% group_by(month(FECHA))%>%summarise(cantidad = n())
+g13<- fallecidos_sinadef %>% filter(year(FECHA)==2019) %>% group_by(month(FECHA))%>% summarise(cantidad = n())
+g13_1<-fallecidos_sinadef %>% filter(year(FECHA)==2020)%>% group_by(month(FECHA))%>%summarise(cantidad = n())
 fallecidos_delta <- g13_1$cantidad - g13$cantidad
 delta <- data.frame( "Mes"= g13$`month(FECHA)`,"cantidad" =fallecidos_delta)
 delta$tipo = "Diferencia de Fallecidos"
@@ -142,10 +139,224 @@ g13 <-rbind(delta,covid)
 g13%>% ggplot(aes(y =cantidad, x = Mes,fill=tipo  )) + geom_bar(position="dodge",stat="identity")+  scale_x_continuous(labels=as.character(month.abb[g13$Mes] ),breaks=g13$Mes)+ggtitle("Diferencia de Fallecidos entre 2019-2020 vs Fallecidos por Covid")
 ```
 
-Interpretación:
+14.positivos por covid vs fallecidos por covid en Arequipa en Agosto
+Interpretación: Se puede observar como aumentaron la cantidad de fallecidos en el 2020 y como se correlaciona a las muertes de covid
 ```{r}
-positivos<- positivos_covid%>%filter(DEPARTAMENTO != "LIMA REGION" & DEPARTAMENTO != "LIMA") %>% group_by(DEPARTAMENTO,SEXO)%>%summarise(cantidad_positivos =n())
+g14_1<- fallecidos_covid %>% filter(DEPARTAMENTO=="AREQUIPA" & month(FECHA_FALLECIMIENTO)==8 & year(FECHA_FALLECIMIENTO)== 2020)
+g14_2<- positivos %>% filter(DEPARTAMENTO=="AREQUIPA" & month(FECHA_RESULTADO)==8 & year(FECHA_RESULTADO)== 2020)
+g14_1 <- g14_1 %>% group_by(DISTRITO)%>% summarise( FallecidosCovid = n())
+g14_2 <-g14_2 %>% group_by(DISTRITO)%>% summarise( Positivos = n())
+g14<-g14_1 %>% inner_join(g14_2)
+g14 %>%ggplot(aes(Positivos,FallecidosCovid ,color =DISTRITO)) +  geom_point()+ggtitle("positivos por covid vs fallecidos por covid en Arequipa en Agosto") 
+```
+
+
+15. Comparación de Sexo En cantidad de muertos vs fallecidos
+Interpretación: Vista más detallada entre departamentos que muestra mientras más positivos tiene un departamento, existe una mayor diferencia entre fallecidos hombres y mujeres.
+```{r}
+positivos<- positivos%>%filter(DEPARTAMENTO != "LIMA REGION" & DEPARTAMENTO != "LIMA") %>% group_by(DEPARTAMENTO,SEXO)%>%summarise(cantidad_positivos =n())
 fallecidos<- fallecidos_covid%>%filter(DEPARTAMENTO!= "LIMA") %>% group_by(DEPARTAMENTO,SEXO)%>% summarise(cantidad_fallecidos=n())
 g15<- cbind(positivos,fallecidos = fallecidos$cantidad_fallecidos)
-df%>%ggplot(aes(x,y ,color =grupo)) +  geom_point()+ggtitle("Grupos clasificados por Kmeans") 
+g15%>%ggplot(aes(cant idad_positivos,fallecidos ,shape =SEXO,color=DEPARTAMENTO)) +  geom_point()+ggtitle("Comparación de Sexo En cantidad de muertos vs fallecidos") 
 ```
+## Versiones de plotly
+
+16. Estado Civil y Cantidad de Fallecidos SINADEF DATABASE
+Interpretación: El porcentaje de personas que mueren solteras en Perú es muy alta incluso ganandole a casados, algo muy impactante ya que la sociedad peruana disimula que la mayoría de personas estan casadas por tabu
+```{r}
+fallecidos_sinadef
+g1 <- fallecidos_sinadef %>%  group_by(ESTADO.CIVIL) %>% summarise( Cantidad = n())
+g1 <- g1[order(-g1$Cantidad),]
+
+
+plot_ly(
+  x = g1$Cantidad,
+  y = reorder(g1$ESTADO.CIVIL,g1$Cantidad),
+  name = "Estado Civil y Cantidad de Fallecidos SINADEF DATABASE",
+  type = "bar"
+)
+
+
+```
+
+17. Muertos por sexo
+Interpretación: han muerto más de 5 mil hombres que mujeres en los últimos años
+```{r}
+g2 <- fallecidos_sinadef %>%  group_by(SEXO) %>% summarise( Cantidad = n())
+g2 <- g2[c(1,3),]
+g2 %>%ggplot(aes(y =SEXO, x =Cantidad, fill=SEXO)) + geom_bar(stat="identity")+ theme(legend.position='none') +ggtitle("Muertos por sexo") %>% scale_x_continuous()
+plot_ly(
+  x = g2$Cantidad,
+  y = g2$SEXO,
+  name = "Muertos por sexo",
+  type = "bar"
+)
+```
+
+
+18. Cantidad de fallecidos del 2017 al 2020
+Interpretación: La cantidad de muertes es casi el doble en el último año debido al covid
+```{r}
+g3<- fallecidos_sinadef %>%  group_by("YEAR" = year(FECHA)) %>% summarise( Cantidad = n())
+
+
+plot_ly(
+  x = g3$YEAR,
+  y = g3$Cantidad,
+  name = "Cantidad de fallecidos del 2017 al 2020",
+  type = "bar"
+)
+```
+
+
+19. Cantidad de fallecidos por COVID en serie de tiempo
+Interpretación: Se puede ver la primera ola a mediados de año y subsecuente bajada luego de alcanzar la inmunidad de rebaño
+```{r}
+g4<- fallecidos_covid %>%  group_by("Mes" = month(as.Date(FECHA_FALLECIMIENTO))) %>% summarise( Cantidad = n())
+
+plot_ly(g4, x = ~Mes, y = ~Cantidad, type = 'scatter', mode = 'lines')
+
+
+```
+
+
+20. Diferencia de sexo en positivos de covid
+Interpretación: La cantidad de hombres infectados por covid duplica a la de los infectados en mujeres, esto puede ser a que los hombres no toman las precauciones necesarias
+```{r}
+g5<- fallecidos_covid %>%  group_by("Sexo" = SEXO) %>% summarise( Cantidad = n())
+g5 %>%ggplot(aes(y =Cantidad, x = Sexo ,fill=Sexo)) + geom_bar(stat="identity")+ theme(legend.position='none') +ggtitle("Diferencia de sexo en positivos de covid")
+plot_ly(
+  data = g5,
+  x = ~Sexo,
+  y = ~Cantidad,
+  
+  type = "bar",
+  color=~Sexo,
+  name=~Sexo
+)
+
+```
+
+
+21. Diferencia de sexo entre fallecidos en junio
+Interpretación: Según la edad se puede determinar que la edad en que hay más fallecidos de mujeres es entre los 57 a 77 años comparado con los hombres que es un poco mas bajo
+```{r}
+g6<- fallecidos_covid %>% filter(PROVINCIA=="LIMA" & month(FECHA_FALLECIMIENTO)==6)
+plot_ly(data = g6,y = ~EDAD_DECLARADA,x= ~SEXO, type = "box",name = ~SEXO)
+```
+
+
+22. Comparación de fallecidos en departamentos, mes de Octubre
+Interpretación: Arequipa tiene el mayor número de infectados y fallecidos y departamentos como Ancash y San Martín tiene una cantidad parecida de fallecidos por covid pero discrepa mucho su cantidad de fallecidos por más de 5 mil.
+```{r}
+g7_1<- fallecidos_covid %>% filter(DEPARTAMENTO!="LIMA" & month(FECHA_FALLECIMIENTO)==8 & year(FECHA_FALLECIMIENTO)== 2020)
+g7_2<- fallecidos_sinadef %>% filter(DEPARTAMENTO.DOMICILIO!="LIMA" & month(FECHA)==8 & year(FECHA)== 2020)
+g7_1 <- g7_1 %>% group_by(DEPARTAMENTO)%>% summarise( FallecidosCovid = n())
+g7_2 <-g7_2 %>% group_by("DEPARTAMENTO"=DEPARTAMENTO.DOMICILIO)%>% summarise( Fallecidos = n())
+g7<-g7_1 %>% inner_join(g7_2)
+plot_ly(data = g7, x = ~Fallecidos, y = ~FallecidosCovid,name = ~DEPARTAMENTO)
+```
+
+
+
+
+23. positivos por covid vs fallecidos por covid en Lima en Julio
+Interpretación:San Juan de lurigancho es el peor distrito que ha manejado  el covid por un gran margen.
+```{r}
+g8_1<- fallecidos_covid %>% filter(DEPARTAMENTO=="LIMA" & month(FECHA_FALLECIMIENTO)==7 & year(FECHA_FALLECIMIENTO)== 2020)
+g8_2<- positivos %>% filter(DEPARTAMENTO=="LIMA" & month(FECHA_RESULTADO)==7 & year(FECHA_RESULTADO)== 2020)
+g8_1 <- g8_1 %>% group_by(DISTRITO)%>% summarise( FallecidosCovid = n())
+g8_2 <-g8_2 %>% group_by(DISTRITO)%>% summarise( Positivos = n())
+g8<-g8_1 %>% inner_join(g8_2)
+
+plot_ly(data = g8, x = ~Positivos, y = ~FallecidosCovid,name = ~DISTRITO,title = 'positivos por covid vs fallecidos por covid en Lima en Julio')
+
+```
+
+
+24. Positivos de Covid en Cajamarca por día
+Interpretación: En el mes de julio el rango de edad donde existe mayor cantidad de contagios en cajamarca se ha mantenido
+```{r}
+g_9<- positivos%>% filter(DEPARTAMENTO=="CAJAMARCA" & month(FECHA_RESULTADO)==7 & year(FECHA_RESULTADO)== 2020)
+f<-as.factor( day(g_9$FECHA_RESULTADO))
+plot_ly(data = g_9,x = f,y= ~EDAD, type = "box")
+
+```
+25. Diagrama de cajas de Departamento y Edad
+Interpretación: El rango de contagios en los repartamentos han sido similares en varios departamentos confirmando que el virus afecta más a las personas que estan entre 60 y 80 años
+```{r}
+g_10<- fallecidos_covid 
+plot_ly(data = g_10,x = ~DEPARTAMENTO,y= ~EDAD_DECLARADA, type = "box",name =~DEPARTAMENTO )
+```
+26. Diferencia de muertos entre el año 2010-2020 vs muertos por coronavirus
+Interpretación:Se puede observar como aumentaron la cantidad de fallecidos en el 2020 y como se correlaciona a las muertes de covid
+```{r}
+g11_2 <- fallecidos_sinadef %>% filter(year(FECHA)==2020 & month(FECHA)>2)%>% group_by("Mes" = month(FECHA)) %>% summarise( Cantidad = n())
+g11<- fallecidos_covid%>% filter(month(FECHA_FALLECIMIENTO)<12) %>%  group_by("Mes" = month(as.Date(FECHA_FALLECIMIENTO))) %>% summarise( Cantidad = n())
+g11$Tipo = "Fallecidos Covid"
+g11_2$Tipo = "Fallecidos"
+g11 <- rbind(g11,g11_2)
+
+plot_ly(
+  data = g11,
+  x = ~Mes,
+  y = ~Cantidad,
+  type = "bar",
+  name=~Tipo
+)
+
+```
+27. Promedio de muertos en Miraflores por Mes
+Interpretación: El promedio de edades en las cuales se a contagiado los miraflorinos se ha mantenido en 42
+```{r}
+g12 <- positivos %>% filter(DISTRITO=="MIRAFLORES")
+g12<-g12 %>% group_by( "Mes"=month(FECHA_RESULTADO)) %>% summarise(Promedio = mean(EDAD)) 
+g12%>% ggplot(aes(y =Promedio, x = Mes  )) + geom_bar(stat="identity")+  scale_x_continuous(labels=as.character(month.abb[g12$Mes] ),breaks=g12$Mes)
+plot_ly(
+  data = g12,
+  x = ~Mes,
+  y = ~Promedio,
+  type = "bar"
+)
+```
+
+28. Diferencia de Fallecidos entre 2019-2020 vs Fallecidos por Covid
+Interpretación:Se puede ver la diferencia de muertos la cual debería ser similar a las muertes por coronavirus, sin embargo la primera trriplica la cantidad de fallecidos por covid dando a entender que no se estas reportando la cantidad de muertes reales por covid por falta de testeo 
+```{r}
+g13<- fallecidos_sinadef %>% filter(year(FECHA)==2019) %>% group_by(month(FECHA))%>% summarise(cantidad = n())
+g13_1<-fallecidos_sinadef %>% filter(year(FECHA)==2020)%>% group_by(month(FECHA))%>%summarise(cantidad = n())
+fallecidos_delta <- g13_1$cantidad - g13$cantidad
+delta <- data.frame( "Mes"= g13$`month(FECHA)`,"cantidad" =fallecidos_delta)
+delta$tipo = "Diferencia de Fallecidos"
+covid <-fallecidos_covid %>% group_by("Mes"=month(FECHA_FALLECIMIENTO))%>% summarise(cantidad = n())
+covid$tipo = "Fallecidos por Covid"
+g13 <-rbind(delta,covid)
+plot_ly(
+  data = g13,
+  x = ~Mes,
+  y = ~cantidad,
+  type = "bar",
+  name=~tipo
+)
+```
+29. positivos por covid vs fallecidos por covid en Arequipa en Octubre
+
+```{r}
+g14_1<- fallecidos_covid %>% filter(DEPARTAMENTO=="AREQUIPA" & month(FECHA_FALLECIMIENTO)==8 & year(FECHA_FALLECIMIENTO)== 2020)
+g14_2<- positivos %>% filter(DEPARTAMENTO=="AREQUIPA" & month(FECHA_RESULTADO)==8 & year(FECHA_RESULTADO)== 2020)
+g14_1 <- g14_1 %>% group_by(DISTRITO)%>% summarise( FallecidosCovid = n())
+g14_2 <-g14_2 %>% group_by(DISTRITO)%>% summarise( Positivos = n())
+g14<-g14_1 %>% inner_join(g14_2)
+plot_ly(data = g14, x = ~Positivos, y = ~FallecidosCovid,name = ~DISTRITO,title = 'positivos por covid vs fallecidos por covid en Arequipa en Octubre')
+```
+
+
+30. Comparación de Sexo En cantidad de muertos vs fallecidos
+Interpretación: Vista más detallada entre departamentos que muestra mientras más positivos tiene un departamento, existe una mayor diferencia entre fallecidos hombres y mujeres.
+```{r}
+positivos2<- positivos%>%filter(DEPARTAMENTO != "LIMA REGION" & DEPARTAMENTO != "LIMA") %>% group_by(DEPARTAMENTO,SEXO)%>%summarise(cantidad_positivos =n())
+fallecidos<- fallecidos_covid%>%filter(DEPARTAMENTO!= "LIMA") %>% group_by(DEPARTAMENTO,SEXO)%>% summarise(cantidad_fallecidos=n())
+g15<- cbind(positivos2,fallecidos = fallecidos$cantidad_fallecidos)
+plot_ly(data = g15, x = ~cantidad_positivos, y = ~fallecidos, color = ~DEPARTAMENTO, symbol = ~SEXO, symbols = c('circle','x'))
+```
+

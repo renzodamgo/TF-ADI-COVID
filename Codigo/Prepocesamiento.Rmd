@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 source(file="./Configuracion.R")
+library(jsonlite)
 ```
 
 Importación de datos
@@ -62,5 +63,16 @@ fallecidos_sinadef %>% filter(SEXO != "MASCULINO" | SEXO != "FEMENINO")
 Eliminación de Outliers
 ```{r}
 # eliminar a las personas de mas de 100 años
+```
+
+Exportación de Archivos:
+
+```{r}
+#Exportar archivos en csv
+write.csv(fallecidos_sinadef,"./Data/fallecidos_sinadef_clean.csv", row.names = FALSE)
+#exportar en json
+x<- toJSON(positivos)
+write(x, "./Data/positivos.json")
+#Guardar database
 ```
 
